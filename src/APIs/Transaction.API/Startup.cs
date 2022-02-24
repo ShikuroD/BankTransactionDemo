@@ -20,6 +20,8 @@ using Transaction.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Plain.RabbitMQ;
+using RabbitMQ.Client;
 
 namespace Transaction.API
 {
@@ -56,6 +58,13 @@ namespace Transaction.API
 
             //add services
             services.AddScoped<ITransactionService, TransactionService>();
+
+            services.AddSingleton<IConnectionProvider>(new ConnectionProvider("amqp://guest:guest@localhost:5672"));
+            services.AddSingleton<ISubscriber>(x => new Subscriber(x.GetService<IConnectionProvider>(),
+                    "exchange_demo",
+                    "queue_transaction",
+                    "transaction",
+                    ExchangeType.Direct));
 
             ConfigureAuthentication(services);
         }

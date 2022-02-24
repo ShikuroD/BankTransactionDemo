@@ -47,6 +47,7 @@ namespace BankTransactionConsole.Models
     public enum TransactionType
     {
         Deposit,
-        Withdraw
+        Withdraw,
+        Balance
     }
 }

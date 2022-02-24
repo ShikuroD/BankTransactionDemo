@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using RabbitMQ.Client;
+using System.Text;
 
 namespace BankTransactionConsole
 {
@@ -71,6 +73,9 @@ namespace BankTransactionConsole
 
         static void Main(string[] args)
         {
+            //Program ruuner = new Program();
+            InitConnection();
+            InitExChange();
             RunAync().Wait();
         }
         
@@ -236,6 +241,24 @@ namespace BankTransactionConsole
 
             Console.WriteLine();
         }
+        public static ConnectionFactory _factory {get; set;}
+        public static IConnection _connection {get; set;}
+        public static IModel _channel {get; set;}
+        public static string exchangeName { get; set; } ="exchange_demo";
+        public static void InitConnection(){
+            _factory = new ConnectionFactory() { HostName = "localhost" };
+            _connection = _factory.CreateConnection(); 
+            _channel = _connection.CreateModel();
+        }
+        public static void InitExChange(){
+            _channel.ExchangeDeclare(exchangeName, ExchangeType.Direct);
+        }
+        public void Publish(string routeKey ="", string message ="hello world"){
+            var body = Encoding.UTF8.GetBytes(message);
+            _channel.BasicPublish(exchange: exchangeName,
+                                routingKey: routeKey,
+                                basicProperties: null,
+                                body: body);
+        }
     }
-    
 }

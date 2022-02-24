@@ -19,6 +19,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Plain.RabbitMQ;
+using RabbitMQ.Client;
 
 namespace Identity.API
 {
@@ -65,6 +67,12 @@ namespace Identity.API
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
             });
+            services.AddSingleton<IConnectionProvider>(new ConnectionProvider("amqp://guest:guest@localhost:5672"));
+            services.AddSingleton<ISubscriber>(x => new Subscriber(x.GetService<IConnectionProvider>(),
+                    "exchange_demo",
+                    "queue_authenticate",
+                    "identity",
+                    ExchangeType.Direct));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

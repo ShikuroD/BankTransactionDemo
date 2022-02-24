@@ -32,6 +32,7 @@ namespace Transaction.API.Models
     public enum TransactionType
     {
         Deposit,
-        Withdraw
+        Withdraw,
+        Balance
     }
 }
