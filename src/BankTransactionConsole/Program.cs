@@ -9,6 +9,7 @@ using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using System.Text;
 
 namespace BankTransactionConsole
