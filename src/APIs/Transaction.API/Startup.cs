@@ -21,9 +21,6 @@ using Transaction.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Plain.RabbitMQ;
-using RabbitMQ.Client;
-using Transaction.API.Helpers;
 
 namespace Transaction.API
 {
