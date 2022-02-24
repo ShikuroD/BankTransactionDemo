@@ -9,6 +9,7 @@ using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using System.Text;
 
 namespace BankTransactionConsole
@@ -74,9 +75,9 @@ namespace BankTransactionConsole
         static void Main(string[] args)
         {
             //Program ruuner = new Program();
-            InitConnection();
-            InitExChange();
-            RunAync().Wait();
+            //RunAync().Wait();
+
+            RunQueue();
         }
         
         static async Task RunAync()
@@ -245,20 +246,77 @@ namespace BankTransactionConsole
         public static IConnection _connection {get; set;}
         public static IModel _channel {get; set;}
         public static string exchangeName { get; set; } ="exchange_demo";
+        public static IBasicProperties props;
+        public static string correlationId;
+        public static string replyQueueName ="reply_transaction";
+        public static string replyRoutingkey = "reply_route_transaction";
         public static void InitConnection(){
             _factory = new ConnectionFactory() { HostName = "localhost" };
             _connection = _factory.CreateConnection(); 
             _channel = _connection.CreateModel();
+            
+            props = _channel.CreateBasicProperties();
+            correlationId = Guid.NewGuid().ToString();
+            props.CorrelationId = correlationId;
+            props.ReplyTo = replyRoutingkey;
+        }
+        public static void InitQueue(string name = "hello")
+        {
+            _channel.QueueDeclare(
+                queue: name, 
+                durable: false, 
+                exclusive: false, 
+                autoDelete: false, 
+                arguments: null);
+        }
+        public static void InitQueueBind(string queueName, string routingKey){
+            _channel.QueueBind(queue: queueName,
+                              exchange: "exchange_demo",
+                              routingKey: routingKey);
         }
         public static void InitExChange(){
             _channel.ExchangeDeclare(exchangeName, ExchangeType.Direct);
         }
-        public void Publish(string routeKey ="", string message ="hello world"){
-            var body = Encoding.UTF8.GetBytes(message);
-            _channel.BasicPublish(exchange: exchangeName,
-                                routingKey: routeKey,
-                                basicProperties: null,
-                                body: body);
+        public static void Publish(string routeKey ="", string message ="hello world"){
+            Console.WriteLine("publish " + message);
+            var messageBytes = Encoding.UTF8.GetBytes(message);
+                _channel.BasicPublish(
+                    exchange: exchangeName,
+                    routingKey: "transaction",
+                    basicProperties: props,
+                    body: messageBytes);
+            //return respQueue.Take();
+        }
+        public static void Receive(){
+            var consumer = new EventingBasicConsumer(_channel);
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body.ToArray();
+                var response = Encoding.UTF8.GetString(body);
+                Console.WriteLine("[x]: "+response);
+                // if (ea.BasicProperties.CorrelationId == correlationId)
+                // {
+                //     respQueue.Add(response);
+                // }
+            };
+
+            _channel.BasicConsume(
+                consumer: consumer,
+                queue: replyQueueName,
+                autoAck: true);
+    
+        }
+        public static void RunQueue(){
+            Console.WriteLine("Running");
+            InitConnection();
+            InitExChange();
+            InitQueue("queue_transaction");
+            InitQueue("reply_transaction");
+            InitQueueBind("queue_transaction","transaction");
+            InitQueueBind("reply_transaction","reply_route_transaction");
+            Receive();
+            Publish("queue_transaction","from consoles");
+            Console.ReadLine();
         }
     }
 }

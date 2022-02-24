@@ -21,12 +21,13 @@ namespace Transaction.API.Helpers
         private readonly ITransactionService _service;
         private Consumer _consumer {get; set;}
         private readonly IConfiguration _config;
-        public Processor(IServiceScopeFactory factory, ITransactionService service, IConfiguration config)
+        public Processor(IServiceScopeFactory factory, IConfiguration config)
         {
             _config = config;
-            _service = service;
+            _service = factory.CreateScope().ServiceProvider.GetRequiredService<ITransactionService>();;
             _consumer = new Consumer();
             //_consumer.QueueBind("exchange_demo","queue_todo","todo.*");
+            Console.WriteLine("background: ");
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -44,8 +45,7 @@ namespace Transaction.API.Helpers
                 var replyProps = _consumer._channel.CreateBasicProperties();
                 replyProps.CorrelationId = props.CorrelationId;
                 string message = Encoding.UTF8.GetString(body);
-                ProcessMessage(message);
-
+                response = ProcessMessage(message);
                 var responseBytes = Encoding.UTF8.GetBytes(response);
                 _consumer._channel.BasicPublish(exchange: "exchange_demo", routingKey: props.ReplyTo,
                       basicProperties: replyProps, body: responseBytes);
@@ -54,13 +54,13 @@ namespace Transaction.API.Helpers
                                 autoAck: true,
                                 consumer: consumer);
         }
-        private bool ProcessMessage(string message)
+        private string ProcessMessage(string message)
         {
             Console.WriteLine("task queue: " + message.ToString());
-            TransactionMessage myMessage = JsonConvert.DeserializeObject<TransactionMessage>(message);
+            //TransactionMessage myMessage = JsonConvert.DeserializeObject<TransactionMessage>(message);
             
             // if(myMessage != null && myMessage.type == "post")
-            return true;
+            return "Test ok, connect success";
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {
