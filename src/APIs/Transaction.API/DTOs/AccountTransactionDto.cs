@@ -11,6 +11,11 @@ namespace Transaction.API.DTOs
         public TransactionType TransactionType { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
+
+        public bool isNull()
+        {
+            return this.AccountNumber == 0 || this.Amount == 0;
+        }
         public AccountTransactionDto(int transactionId, int accountNumber, DateTime date, TransactionType transactionType, string description, decimal amount)
         {
             TransactionId = transactionId;

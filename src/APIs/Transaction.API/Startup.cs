@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Transaction.API.Helpers;
 using Transaction.API.Data;
 using Transaction.API.Data.Repositories;
 using Transaction.API.Mappers;
@@ -58,13 +59,7 @@ namespace Transaction.API
 
             //add services
             services.AddScoped<ITransactionService, TransactionService>();
-
-            services.AddSingleton<IConnectionProvider>(new ConnectionProvider("amqp://guest:guest@localhost:5672"));
-            services.AddSingleton<ISubscriber>(x => new Subscriber(x.GetService<IConnectionProvider>(),
-                    "exchange_demo",
-                    "queue_transaction",
-                    "transaction",
-                    ExchangeType.Direct));
+            services.AddHostedService<Processor>();
 
             ConfigureAuthentication(services);
         }

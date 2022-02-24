@@ -27,6 +27,7 @@ namespace Transaction.API.Models
         public AccountTransaction()
         {
         }
+        
     }
 
     public enum TransactionType

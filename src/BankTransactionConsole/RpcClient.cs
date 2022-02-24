@@ -1,3 +1,4 @@
+using System.Transactions;
 using System;
 using System.Collections.Concurrent;
 using System.Text;
@@ -15,7 +16,7 @@ namespace BankTransactionConsole
         private readonly BlockingCollection<string> respQueue = new BlockingCollection<string>();
         private readonly IBasicProperties props;
 
-        public string ExchangeName { get; set; } ="exchange_demo";
+        public string ExchangeName { get; set; } = "exchange_demo";
 
         public RpcClient()
         {
@@ -23,6 +24,25 @@ namespace BankTransactionConsole
 
             connection = factory.CreateConnection();
             channel = connection.CreateModel();
+            channel.QueueDeclare(
+                queue: "transaction",
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+            channel.QueueBind(queue: "transaction",
+                              exchange: "exchange_demo",
+                              routingKey: "transaction_route");
+
+            channel.QueueDeclare(
+                queue: "reply",
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+            channel.QueueBind(queue: "reply",
+                            exchange: "exchange_demo",
+                            routingKey: "reply_route");
             channel.ExchangeDeclare(ExchangeName, ExchangeType.Direct);
             replyQueueName = channel.QueueDeclare().QueueName;
             consumer = new EventingBasicConsumer(channel);
@@ -48,7 +68,7 @@ namespace BankTransactionConsole
                 autoAck: true);
         }
 
-        public string Call(string routingKey, string message )
+        public string Call(string routingKey, string message)
         {
             var messageBytes = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish(
@@ -68,7 +88,7 @@ namespace BankTransactionConsole
 
     public class RoutingKey
     {
-        public static readonly string IndentityKey  = "identity";
+        public static readonly string IndentityKey = "identity";
         public static readonly string TransactionKey = "transaction";
     }
 }
