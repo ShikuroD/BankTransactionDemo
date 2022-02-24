@@ -22,6 +22,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Plain.RabbitMQ;
 using RabbitMQ.Client;
+using Transaction.API.Helpers;
 
 namespace Transaction.API
 {
@@ -65,7 +66,7 @@ namespace Transaction.API
                     "queue_transaction",
                     "transaction",
                     ExchangeType.Direct));
-
+            services.AddHostedService<Processor>();
             ConfigureAuthentication(services);
         }
 
