@@ -76,7 +76,8 @@ namespace BankTransactionConsole
 
         static async Task<AccountSummary> GetBalanceMQ()
         {
-            var message = new TransactionMessage(client.DefaultRequestHeaders.Authorization.ToString(),
+            var token = client.DefaultRequestHeaders.Authorization.ToString().Split(' ')[1];
+            var message = new TransactionMessage(token,
                                         MessageCode.Balance,
                                         JsonConvert.SerializeObject(null));
             var response = rpcClient.Call("transaction_route", JsonConvert.SerializeObject(message));
@@ -85,7 +86,8 @@ namespace BankTransactionConsole
         }
         static async Task<AccountTransactionResponse> DepositMQ(AccountTransaction tranx)
         {
-            var message = new TransactionMessage(client.DefaultRequestHeaders.Authorization.ToString(),
+            var token = client.DefaultRequestHeaders.Authorization.ToString().Split(' ')[1];
+            var message = new TransactionMessage(token,
                                         MessageCode.Deposit,
                                         JsonConvert.SerializeObject(tranx));
             var response = rpcClient.Call("transaction_route", JsonConvert.SerializeObject(message));
@@ -94,7 +96,8 @@ namespace BankTransactionConsole
         }
         static async Task<AccountTransactionResponse> WithdrawMQ(AccountTransaction tranx)
         {
-            var message = new TransactionMessage(client.DefaultRequestHeaders.Authorization.ToString(),
+            var token = client.DefaultRequestHeaders.Authorization.ToString().Split(' ')[1];
+            var message = new TransactionMessage(token,
                                         MessageCode.Withdraw,
                                         JsonConvert.SerializeObject(tranx));
             var response = rpcClient.Call("transaction_route", JsonConvert.SerializeObject(message));
