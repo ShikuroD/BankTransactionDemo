@@ -2,12 +2,12 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Transaction.API.Data.Repositories;
-using Transaction.API.DTOs;
-using Transaction.API.Exceptions;
-using Transaction.API.Models;
+using Transaction.APIcopy.Data.Repositories;
+using Transaction.APIcopy.DTOs;
+using Transaction.APIcopy.Exceptions;
+using Transaction.APIcopy.Models;
 
-namespace Transaction.API.Services
+namespace Transaction.APIcopy.Services
 {
     public class TransactionService : ITransactionService
     {

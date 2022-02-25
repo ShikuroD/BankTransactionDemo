@@ -6,12 +6,12 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Transaction.API.Data.Repositories;
-using Transaction.API.DTOs;
-using Transaction.API.Models;
-using Transaction.API.Services;
+using Transaction.APIcopy.Data.Repositories;
+using Transaction.APIcopy.DTOs;
+using Transaction.APIcopy.Models;
+using Transaction.APIcopy.Services;
 
-namespace Transaction.API.Controllers {
+namespace Transaction.APIcopy.Controllers {
 
     [ApiController]
     [Route ("api/[controller]")]
@@ -37,7 +37,7 @@ namespace Transaction.API.Controllers {
         public async Task<ActionResult<AccountSummaryDto>> GetAccountSummary () {
             var accountNumber = int.Parse (User.FindFirstValue ("accountNumber"));
             var summary = await _accountSummaryRepos.GetBy (accountNumber);
-            Console.WriteLine($"\nExecute: Get balance\nAccount Number:{summary.AccountNumber}\nBalance:{summary.Balance}");
+            Console.WriteLine($">   Execute: Get balance\nAccount Number:{summary.AccountNumber}\nBalance:{summary.Balance}");
             if (summary == null) {
                 return NotFound ("User not found");
             }
@@ -67,7 +67,7 @@ namespace Transaction.API.Controllers {
             var tranxRes = new AccountTransactionResponse ();
             try {
                 tranxRes = await _service.ExecuteTransaction (tranx);
-                Console.WriteLine($">   Execute: {tranxDto.TransactionType.ToString()}\nAccount Number:{tranxDto.AccountNumber}\nAmount:{tranxDto.Amount}");
+                Console.WriteLine($"\nExecute: {tranxDto.TransactionType.ToString()}\nAccount Number:{tranxDto.AccountNumber}\nAmount:{tranxDto.Amount}");
             } catch (InsufficientExecutionStackException ex) {
                 Console.WriteLine (ex.ToString ());
                 return Ok (new AccountTransactionResponse (ex.Message, 0, null));

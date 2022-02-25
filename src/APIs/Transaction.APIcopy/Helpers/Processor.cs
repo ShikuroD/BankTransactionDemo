@@ -15,11 +15,11 @@ using Newtonsoft.Json;
 using Plain.RabbitMQ;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Transaction.API.DTOs;
-using Transaction.API.Models;
-using Transaction.API.Services;
+using Transaction.APIcopy.DTOs;
+using Transaction.APIcopy.Models;
+using Transaction.APIcopy.Services;
 
-namespace Transaction.API.Helpers {
+namespace Transaction.APIcopy.Helpers {
     public class Processor : IHostedService {
         private readonly ITransactionService _service;
         private readonly IConfiguration _config;
@@ -78,7 +78,7 @@ namespace Transaction.API.Helpers {
                 client.DefaultRequestHeaders.Accept.Clear ();
                 client.DefaultRequestHeaders.Accept.Add (new MediaTypeWithQualityHeaderValue ("application/json"));
                 client.DefaultRequestHeaders.Add ("Authorization", "Bearer " + myMessage.Token);
-                var baseUri = $"http://localhost:5000/api/account";
+                var baseUri = $"http://localhost:5003/api/account";
                 try {
                     switch (myMessage.Code) {
                         case MessageCode.Balance:
