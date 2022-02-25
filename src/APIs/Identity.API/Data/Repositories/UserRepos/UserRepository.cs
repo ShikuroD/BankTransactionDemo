@@ -26,7 +26,7 @@ namespace Identity.API.Data.Repositories
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine("\nUser not found");
                 return null;
             }
             return user;
